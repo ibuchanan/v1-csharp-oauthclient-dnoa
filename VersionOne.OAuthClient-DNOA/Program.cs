@@ -50,6 +50,7 @@ namespace VersionOne.OAuthClient_DNOA
             Console.WriteLine("\n[STEP] Obtain Credentials");
             RequestAuthorization(client);
             var code = ReceiveAuthorizationCode();
+            var state = RequestAccessToken(client, code);
             return;
         }
 
@@ -71,10 +72,15 @@ namespace VersionOne.OAuthClient_DNOA
             return code;
         }
 
-        private static void RequestAccessToken()
+        private static IAuthorizationState RequestAccessToken(UserAgentClient client, string code)
         {
             Console.WriteLine("\n[STEP] Request Access Token");
-            return;
+            // Need the same thing this guy is asking:
+            // http://stackoverflow.com/questions/11644187/use-dotnetopenauth-oauth2-to-get-access-token-by-code
+            var state = client.ProcessUserAuthorization(new Uri(_secrets.RedirectUris[0]));
+            state = client.GetClientAccessToken(new[] {Scope});
+            Console.WriteLine("  Received new access token.");
+            return state;
         }
 
         private static void RequestResource()
